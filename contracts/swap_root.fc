@@ -13,6 +13,7 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
     int gas_fee = ds~load_coins();
     int fwd_amount = ds~load_coins();
     int min_value = ds~load_coins();
+    int percentage = ds~load_uint(32);
     cell swap_wallet_code = ds~load_ref();
 
     return (
@@ -22,6 +23,7 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
         gas_fee,
         fwd_amount,
         min_value,
+        percentage,
         swap_wallet_code
     );
 }
@@ -34,6 +36,7 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
     int gas_fee,
     int fwd_amount,
     int min_value,
+    int percentage,
     cell swap_wallet_code
 ) impure inline {
     set_data(
@@ -44,6 +47,7 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
             .store_coins(gas_fee)
             .store_coins(fwd_amount)
             .store_coins(min_value)
+            .store_uint(percentage, 32)
             .store_ref(swap_wallet_code)   
         .end_cell()
     );
@@ -54,11 +58,12 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
 () init_swap_wallet(slice msg_sender) impure {
     (
         slice admin_address, 
-        slice co_admin_address, 
+        slice co_admin_address,
         int fee, 
         int gas_fee,
         int fwd_amount,
         int min_value,
+        int percentage,
         cell swap_wallet_code
     ) = load_data();
     cell state_init = calculate_swap_wallet_state_init(msg_sender,my_address(),swap_wallet_code);
@@ -70,11 +75,12 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
 () update_fees(slice in_msg_body, slice msg_sender) impure {
     (
         slice admin_address, 
-        slice co_admin_address, 
+        slice co_admin_address,
         int fee, 
         int gas_fee,
         int fwd_amount,
         int min_value,
+        int percentage,
         cell swap_wallet_code
     ) = load_data();
 
@@ -83,48 +89,52 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
     gas_fee = in_msg_body~load_coins();
     fwd_amount = in_msg_body~load_coins();
     min_value = in_msg_body~load_coins();
-    save_data(admin_address,co_admin_address,fee,gas_fee,fwd_amount,min_value,swap_wallet_code);
+    percentage = in_msg_body~load_uint(32);
+    save_data(admin_address,co_admin_address,fee,gas_fee,fwd_amount,min_value,percentage,swap_wallet_code);
 }
 
 () change_admin(slice in_msg_body, slice msg_sender) impure {
     (
         slice admin_address, 
-        slice co_admin_address, 
+        slice co_admin_address,
         int fee, 
         int gas_fee,
         int fwd_amount,
         int min_value,
+        int percentage,
         cell swap_wallet_code
     ) = load_data();
 
     throw_unless(191, equal_slices(msg_sender,admin_address) | equal_slices(msg_sender,co_admin_address));
     admin_address = in_msg_body~load_msg_addr();
-    save_data(admin_address,co_admin_address,fee,gas_fee,fwd_amount,min_value,swap_wallet_code);
+    save_data(admin_address,co_admin_address,fee,gas_fee,fwd_amount,min_value,percentage,swap_wallet_code);
 }
 
 () change_co_admin(slice in_msg_body, slice msg_sender) impure {
     (
         slice admin_address, 
-        slice co_admin_address, 
+        slice co_admin_address,
         int fee, 
         int gas_fee,
         int fwd_amount,
         int min_value,
+        int percentage,
         cell swap_wallet_code
     ) = load_data();
     throw_unless(192, equal_slices(msg_sender,admin_address) | equal_slices(msg_sender,co_admin_address));
     co_admin_address = in_msg_body~load_msg_addr();
-    save_data(admin_address,co_admin_address,fee,gas_fee,fwd_amount,min_value,swap_wallet_code);
+    save_data(admin_address,co_admin_address,fee,gas_fee,fwd_amount,min_value,percentage,swap_wallet_code);
 }
 
 () withdraw_excess_tokens(int my_balance, slice in_msg_body, slice msg_sender) impure {
     (
         slice admin_address, 
-        slice co_admin_address, 
+        slice co_admin_address,
         int fee, 
         int gas_fee,
         int fwd_amount,
         int min_value,
+        int percentage,
         cell swap_wallet_code
     ) = load_data();
 
@@ -173,11 +183,12 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
     if(op == op::retrieve_fee) {
         (
             slice admin_address, 
-            slice co_admin_address, 
+            slice co_admin_address,
             int fee, 
             int gas_fee,
             int fwd_amount,
             int min_value,
+            int percentage,
             cell swap_wallet_code
         ) = load_data();
 
@@ -191,6 +202,7 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
             .store_coins(gas_fee)
             .store_coins(fwd_amount)
             .store_coins(min_value)
+            .store_uint(percentage, 32)
             .store_slice(admin_address)
             .store_slice(in_msg_body)
         .end_cell();
@@ -207,16 +219,17 @@ const int min_tons_for_storage = 10000000; ;; 0.01 ton
 slice get_user_swap_aggregator_address(slice owner_address) method_id {
     (
         slice admin_address, 
-        slice co_admin_address, 
+        slice co_admin_address,
         int fee, 
         int gas_fee,
         int fwd_amount,
         int min_value,
+        int percentage,
         cell swap_wallet_code
     ) = load_data();
     return calculate_user_swap_wallet_address(owner_address,my_address(),swap_wallet_code);
 }
  
-(slice, slice, int, int, int, int, cell) get_root_data() method_id {
+(slice, slice, int, int, int, int, int, cell) get_root_data() method_id {
     return load_data();
 }

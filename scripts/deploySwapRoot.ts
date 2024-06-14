@@ -15,6 +15,7 @@ export async function run(provider: NetworkProvider) {
                 gasFee: toNano('0'),
                 fwdAmount: toNano('0'),
                 minValue: toNano('0'),
+                percentage: 0,
                 swapAggregatorCode: await compile('SwapAggregator'),
             },
             await compile('SwapRoot'),

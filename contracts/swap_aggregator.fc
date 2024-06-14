@@ -54,7 +54,7 @@ const int gas_consumption = 15000000;
 
 
 
-(int, int, int) calc_fees(int fixed_fee, int trade_value, int percentage, int swapOp) inline_ref {
+(int, int) calc_fees(int fixed_fee, int trade_value, int percentage, int swapOp) inline_ref {
     if(swapOp == 1){
         int trade_fee = trade_value * percentage / 1000;
         return (trade_fee, trade_value);
@@ -95,21 +95,6 @@ const int gas_consumption = 15000000;
     if(msg_value < amount + GAS_FEE + gas_consumption) {
         send_empty_message(0,owner_address,CARRY_REMAINING_GAS);
         return();
-    }
-
-    if(trade_fee == fixed_fee){
-        ;; throw_unless(99, msg_value > GAS_FEE + fixed_fee + gas_consumption);
-        if(msg_value < GAS_FEE + fixed_fee + gas_consumption){
-            send_empty_message(0,owner_address,CARRY_REMAINING_GAS);
-            return();
-        }
-        
-    } else {
-        ;; throw_unless(100, msg_value > GAS_FEE + gas_consumption);
-        if(msg_value < GAS_FEE + gas_consumption){
-            send_empty_message(0,owner_address,CARRY_REMAINING_GAS);
-            return();
-        }
     }
 
     cell msg_body = begin_cell()
@@ -161,6 +146,7 @@ const int gas_consumption = 15000000;
     int GAS_FEE = in_msg_body~load_coins();
     int FWD_AMOUNT = in_msg_body~load_coins();
     int MIN_VALUE = in_msg_body~load_coins();
+    int percentage = in_msg_body~load_uint(32);
     slice fee_wallet = in_msg_body~load_msg_addr();
     slice swap_data = in_msg_body~load_ref().begin_parse();
 
@@ -172,7 +158,7 @@ const int gas_consumption = 15000000;
     int jettonToTon = forward_payload~load_coins();
     slice aggregator_jetton_addr = forward_payload~load_msg_addr();
     slice jetton_vault = forward_payload~load_msg_addr();
-    var (int trade_fee, int trade_value) = calc_fees(fixed_fee, jettonToTon);
+    var (int trade_fee, int trade_value) = calc_fees(fixed_fee, jettonToTon, percentage, 2);
     ;; throw_unless(200, msg_value >  MIN_VALUE + gas_consumption);
     var revert_msg_body = begin_cell()
         .store_uint(op::transfer, 32)
