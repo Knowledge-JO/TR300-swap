@@ -18,8 +18,10 @@ class Op {
     static withdraw_jetton = 1038;
 }
 
+// const swapRootAddress = Address.parse(
+//     'EQDgGkavcO0Tb5yJV2fDwJu3DTDNyAqsEpNApCYEfhvgdvAA',
+// );
 const swapRootAddress = Address.parse(
-    'EQDgGkavcO0Tb5yJV2fDwJu3DTDNyAqsEpNApCYEfhvgdvAA',
+    'EQAJ2GVWWkx_FHHMEbDl88N9YZ4h6Q-3LrcJhwFew1KvA7Y9',
 );
-
 export { Op, swapRootAddress };
