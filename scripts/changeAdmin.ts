@@ -1,7 +1,7 @@
 import { NetworkProvider } from '@ton/blueprint';
 import { SwapRoot } from '../wrappers/SwapRoot';
 import { swapRootAddress } from '../wrappers/constants';
-import { toNano } from '@ton/core';
+import { Address, toNano } from '@ton/core';
 
 export async function run(provider: NetworkProvider) {
     const sender = provider.sender();
@@ -10,11 +10,9 @@ export async function run(provider: NetworkProvider) {
 
     const swapRoot = provider.open(SwapRoot.createFromAddress(swapRootAddress));
 
-    await swapRoot.sendUpdateFees(sender, toNano('0.01'), {
-        fee: toNano('0.00001'),
-        gasFee: toNano('0.2'),
-        fwdAmount: toNano('0.15'),
-        minValue: toNano('0.2'),
-        percentage: 1,
-    });
+    await swapRoot.sendChangeAdmin(
+        sender,
+        toNano('0.01'),
+        Address.parse('UQBZ6AL2EQiiVKUTzgo36FBC-YZryQ9_udo-SNzWkkw78t9A'),
+    );
 }

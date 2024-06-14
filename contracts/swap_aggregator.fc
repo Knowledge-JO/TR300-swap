@@ -109,7 +109,7 @@ const int gas_consumption = 15000000;
         begin_cell()
             .store_uint(msg_flag::bounceable, 6)
             .store_slice(ton_vault_addr)
-            .store_coins(trade_value - trade_fee - gas_consumption)
+            .store_coins(msg_value - trade_fee - gas_consumption)
             .store_zeros(1 + 4 + 4 + 64 + 32 + 1)
             .store_maybe_ref(msg_body)
             .end_cell(),
