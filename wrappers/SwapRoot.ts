@@ -176,6 +176,7 @@ export class SwapRoot implements Contract {
             gasFee: resp.stack.readNumber(),
             fwdAmount: resp.stack.readNumber(),
             minValue: resp.stack.readNumber(),
+            percentage: resp.stack.readNumber(),
             swapAggregatorCode: resp.stack.readCell(),
         };
     }

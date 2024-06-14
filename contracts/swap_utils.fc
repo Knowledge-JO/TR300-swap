@@ -2,17 +2,11 @@
 
 cell pack_swap_wallet_data(
     slice owner_address,
-    int noReferredUsers,
-    int earned,
-    int initialized,
     slice root_addr, 
     cell swap_wallet_code
 ) inline {
    return begin_cell()
             .store_slice(owner_address)
-            .store_uint(noReferredUsers, 32)
-            .store_coins(earned)
-            .store_int(initialized, 4)
             .store_slice(root_addr)
             .store_ref(swap_wallet_code)
         .end_cell();
@@ -29,9 +23,6 @@ cell calculate_swap_wallet_state_init(
             .store_dict(swap_wallet_code)
             .store_dict(pack_swap_wallet_data(
               owner_address,
-              0,
-              0,
-              0,
               root_addr,
               swap_wallet_code
             ))

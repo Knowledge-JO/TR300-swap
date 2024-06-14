@@ -49,12 +49,12 @@ export class SwapAggregator implements Contract {
         via: Sender,
         value: bigint,
         options: {
+            amount: bigint;
             receipientAddress: Address;
             poolAddress: Address;
             tonVaultAddr: Address;
             limit: bigint;
             deadline: number;
-            referralAddress: Cell;
         },
     ) {
         await provider.internal(via, {
@@ -62,12 +62,12 @@ export class SwapAggregator implements Contract {
             sendMode: SendMode.PAY_GAS_SEPARATELY,
             body: beginCell()
                 .storeUint(Op.make_swap_ton, 32)
+                .storeCoins(options.amount)
                 .storeAddress(options.receipientAddress)
                 .storeAddress(options.poolAddress)
                 .storeAddress(options.tonVaultAddr)
                 .storeCoins(options.limit)
                 .storeUint(options.deadline, 32)
-                .storeRef(options.referralAddress)
                 .endCell(),
         });
     }
@@ -109,10 +109,6 @@ export class SwapAggregator implements Contract {
         const resp = await provider.get('get_swap_wallet_data', []);
         return {
             ownerAddress: resp.stack.readAddress(),
-            noReferredUsers: resp.stack.readNumber(),
-            earned: resp.stack.readNumber(),
-            initialized: resp.stack.readNumber(),
-            referrerData: resp.stack.readCell(),
             swapRootAddress: resp.stack.readAddress(),
             swapAggregatorCode: resp.stack.readCell(),
         };
